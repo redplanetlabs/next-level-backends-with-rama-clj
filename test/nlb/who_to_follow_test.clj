@@ -10,8 +10,8 @@
   (with-redefs [wtf/test-mode? (constantly true)
                 wtf/num-who-to-follow-recs (constantly 3)]
     (with-open [ipc (rtest/create-ipc)]
-      (rtest/launch-module! ipc wtf/TwitterModule {:tasks 4 :threads 2})
-      (let [module-name (get-module-name wtf/TwitterModule)
+      (rtest/launch-module! ipc wtf/WhoToFollowModule {:tasks 4 :threads 2})
+      (let [module-name (get-module-name wtf/WhoToFollowModule)
             follows-depot (foreign-depot ipc module-name "*follows-depot")
             who-to-follow-tick (foreign-depot ipc module-name "*who-to-follow-tick")
             who-to-follow (foreign-pstate ipc module-name "$$who-to-follow")]
@@ -21,6 +21,7 @@
         (foreign-append! follows-depot (wtf/->Follow 1 5))
 
         (foreign-append! follows-depot (wtf/->Follow 2 1))
+        (foreign-append! follows-depot (wtf/->Follow 2 3))
         (foreign-append! follows-depot (wtf/->Follow 2 6))
         (foreign-append! follows-depot (wtf/->Follow 2 7))
         (foreign-append! follows-depot (wtf/->Follow 2 8))
@@ -34,11 +35,13 @@
         (foreign-append! follows-depot (wtf/->Follow 3 12))
 
         (foreign-append! follows-depot (wtf/->Follow 4 8))
+        (foreign-append! follows-depot (wtf/->Follow 4 3))
         (foreign-append! follows-depot (wtf/->Follow 4 10))
         (foreign-append! follows-depot (wtf/->Follow 4 13))
         (foreign-append! follows-depot (wtf/->Follow 4 14))
 
         (foreign-append! follows-depot (wtf/->Follow 5 1))
+        (foreign-append! follows-depot (wtf/->Follow 5 3))
         (foreign-append! follows-depot (wtf/->Follow 5 10))
 
         (foreign-append! follows-depot (wtf/->Follow 6 12))

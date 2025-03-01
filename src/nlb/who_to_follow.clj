@@ -75,7 +75,7 @@
           $$who-to-follow)
         ))))
 
-(defmodule TwitterModule
+(defmodule WhoToFollowModule
   [setup topologies]
   (declare-depot setup *follows-depot (hash-by :from))
   (if (test-mode?)
