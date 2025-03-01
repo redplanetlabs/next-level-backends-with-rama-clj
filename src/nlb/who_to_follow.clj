@@ -33,14 +33,9 @@
           (key (-> *m rseq first) :> *max-id)
           (local-transform> (termval *max-id) $$next-id))
         (ops/explode-map *m :> *account-id *follows)
-        (local-select> [(keypath *account-id)
-                        (sorted-set-range-from 0 200)
-                        ALL]
-                       $$follows :> *following-id)
+        (ops/explode *follows :> *following-id)
         (|hash *following-id)
-        (local-select> [(keypath *following-id)
-                        (sorted-set-range-from 0 200)
-                        ALL]
+        (local-select> [(keypath *following-id) ALL]
                        $$follows :> *candidate-id)
         (filter> (not= *candidate-id *account-id))
         (|hash *account-id)
