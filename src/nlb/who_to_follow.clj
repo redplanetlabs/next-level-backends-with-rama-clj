@@ -47,8 +47,10 @@
         (+compound {*account-id {*candidate-id (aggs/+count)}} :> *m)
         (ops/explode-map *m :> *account-id *candidate-counts)
         (mapv first
-              (take 1000
-                    (sort-by (comp - val) (vec *candidate-counts)))
+              (->> *candidate-counts
+                   vec
+                   (sort-by (comp - val))
+                   (take 1000))
               :> *candidate-order)
         (loop<- [*chosen []
                  *candidate-order (seq *candidate-order)
