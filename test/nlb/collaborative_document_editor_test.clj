@@ -95,30 +95,34 @@
       (foreign-append!
         edit-depot
         (cde/->Edit 123 0 0 (cde/->AddText "Hellox")))
-      (rtest/wait-for-microbatch-processed-count ipc module-name "core" 1)
-      (is (= "Hellox" (foreign-select-one [(keypath 123) :content] docs)))
+      (is (= "Hellox" (foreign-select-one (keypath 123) docs)))
 
-      ; (foreign-append!
-      ;   edit-batch-depot
-      ;   (cde/->EditBatch 123
-      ;                    1
-      ;                    [(cde/->Edit 5 (cde/->RemoveText 1))
-      ;                     (cde/->Edit 5 (cde/->AddText " world"))]))
-      ; (rtest/wait-for-microbatch-processed-count ipc module-name "core" 2)
-      ; (is (= "Hello world" (foreign-select-one [(keypath 123) :content] docs)))
-      ;
-      ; (foreign-append!
-      ;   edit-batch-depot
-      ;   (cde/->EditBatch 123
-      ;                    2
-      ;                    [(cde/->Edit 11 (cde/->AddText "!"))]))
-      ; (rtest/wait-for-microbatch-processed-count ipc module-name "core" 3)
-      ; (is (= "Hello world!" (foreign-select-one [(keypath 123) :content] docs)))
+      (foreign-append!
+        edit-depot
+        (cde/->Edit 123 1 5 (cde/->RemoveText 1)))
+      (is (= "Hello" (foreign-select-one (keypath 123) docs)))
 
-      ;; TODO:
-      ;;  - do multiple edits at same version
-      ;;  - do another one with many edits coming in at different versions, including behind
+      (foreign-append!
+        edit-depot
+        (cde/->Edit 123 2 5 (cde/->AddText " wor")))
+      (is (= "Hello world!" (foreign-select-one (keypath 123) docs)))
 
-      ;; TODO use foreign-proxy to demonstrate
-      ;;    - or just show in post and how the diffs works
+      (foreign-append!
+        edit-depot
+        (cde/->Edit 123 3 9 (cde/->AddText "ld!")))
+      (is (= "Hello world!" (foreign-select-one (keypath 123) docs)))
+
+      (foreign-append!
+        edit-depot
+        (cde/->Edit 123 2 5 (cde/->AddText " Rama")))
+
+      (foreign-append!
+        edit-depot
+        (cde/->Edit 123 2 0 (cde/->RemoveText 0 4)))
+
+      (foreign-append!
+        edit-depot
+        (cde/->Edit 123 0 0 (cde/->RemoveText 0 3)))
+
+      (is (= "o Rama world!" (foreign-select-one (keypath 123) docs)))
       )))

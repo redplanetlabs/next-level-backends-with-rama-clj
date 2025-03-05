@@ -112,7 +112,7 @@
           [(keypath *id) (srange *version *latest-version)]
           $$edits :> *missed-edits)
         (transform-edit *edit *missed-edits :> *final-edits))
-      (local-select> [(keypath *id) :content (nil->val "")]
+      (local-select> [(keypath *id) (nil->val "")]
         $$docs :> *latest-doc)
       (apply-edits *latest-doc *final-edits :> *new-doc)
       (local-transform> [(keypath *id) (termval *new-doc)]
@@ -121,7 +121,3 @@
         [(keypath *id) END (termval *final-edits)]
         $$edits)
       )))
-
-
-;; TODO: similar to google docs algorithm:
-;;  - https://medium.com/coinmonks/operational-transformations-as-an-algorithm-for-automatic-conflict-resolution-3bf8920ea447
