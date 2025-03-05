@@ -54,18 +54,31 @@
       (is (= [(test-remove-edit 10 2) (test-remove-edit 15 4)]
              (cde/transform-edit edit [(test-add-edit 12 "...")]))))
     (testing "Remove against missed remove"
-
+      (is (= [(test-remove-edit 8 6)]
+             (cde/transform-edit edit [(test-remove-edit 0 2)])))
+      (is (= [(test-remove-edit 8 3)]
+             (cde/transform-edit edit [(test-remove-edit 8 5)])))
+      (is (= []
+             (cde/transform-edit edit [(test-remove-edit 7 100)])))
+      (is (= [(test-remove-edit 10 5)]
+             (cde/transform-edit edit [(test-remove-edit 10 1)])))
+      (is (= []
+             (cde/transform-edit edit [(test-remove-edit 10 6)])))
+      (is (= []
+             (cde/transform-edit edit [(test-remove-edit 10 10)])))
+      (is (= [(test-remove-edit 10 4)]
+             (cde/transform-edit edit [(test-remove-edit 12 2)])))
+      (is (= [(test-remove-edit 10 2)]
+             (cde/transform-edit edit [(test-remove-edit 12 10)])))
+      (is (= [(test-remove-edit 10 6)]
+             (cde/transform-edit edit [(test-remove-edit 16 1)])))
+      (is (= [(test-remove-edit 10 6)]
+             (cde/transform-edit edit [(test-remove-edit 16 10)])))
+      (is (= [(test-remove-edit 10 6)]
+             (cde/transform-edit edit [(test-remove-edit 18 10)])))
       ))
 
   ;; TODO:
-  ;;  - test remove before not overlapping
-  ;;  - test remove before overlapping
-  ;;  - test remove before full overlap
-  ;;  - test remove at start offset not all of it
-  ;;  - test remove at start offset full overlap
-  ;;  - test remove in middle not to end
-  ;;  - test remove in middle past end
-  ;;  - test remove after end is no-op
   ;;  - test transform against multiple edits in a row
 
   )
