@@ -77,11 +77,14 @@
       (is (= [(test-remove-edit 10 6)]
              (cde/transform-edit edit [(test-remove-edit 18 10)])))
       ))
-
-  ;; TODO:
-  ;;  - test transform against multiple edits in a row
-
-  )
+    (testing "Transform against multiple edits"
+      (is (= [(test-remove-edit 19 1) (test-remove-edit 22 3)]
+             (cde/transform-edit
+               (test-remove-edit 20 5)
+               [(test-add-edit 10 "...")
+                (test-remove-edit 100 10)
+                (test-remove-edit 19 5)
+                (test-add-edit 20 "..")])))))
 
 (deftest module-test
   (with-open [ipc (rtest/create-ipc)]
