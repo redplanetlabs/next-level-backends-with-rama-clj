@@ -1,10 +1,10 @@
-(ns bbb.family-tree-test
+(ns nlb.family-tree-test
   (:use [com.rpl rama]
         [com.rpl.rama path])
   (:require
    [clojure.test :refer [deftest is testing]]
    [com.rpl.rama.test :as rtest]
-   [bbb.family-tree :as ft])
+   [nlb.family-tree :as ft])
   (:import [java.util UUID]))
 
 (deftest family-tree-module-test

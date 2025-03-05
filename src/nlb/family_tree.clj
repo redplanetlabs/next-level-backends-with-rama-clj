@@ -1,4 +1,4 @@
-(ns bbb.family-tree
+(ns nlb.family-tree
   (:use [com.rpl.rama]
         [com.rpl.rama.path])
   (:require [com.rpl.rama.aggs :as aggs]
