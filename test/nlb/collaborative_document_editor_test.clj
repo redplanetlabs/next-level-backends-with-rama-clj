@@ -115,14 +115,11 @@
       (foreign-append!
         edit-depot
         (cde/->Edit 123 2 5 (cde/->AddText "abcd")))
-
       (foreign-append!
         edit-depot
         (cde/->Edit 123 2 0 (cde/->RemoveText 4)))
-
       (foreign-append!
         edit-depot
         (cde/->Edit 123 1 0 (cde/->RemoveText 3)))
-
-      (is (= {:doc "o worabcdld!" :version 6} (foreign-invoke-query doc+version 123)))
+      (is (= {:doc "o world!abcd" :version 6} (foreign-invoke-query doc+version 123)))
       )))

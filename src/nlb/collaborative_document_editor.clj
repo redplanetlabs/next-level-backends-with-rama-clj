@@ -9,7 +9,7 @@
 
 (defrecord Edit [id version offset action])
 
-(defn add-action-adjustment [action]
+(defn add-action-adjustment [{:keys [action]}]
   (if (instance? AddText action)
     (-> action :content count)
     (-> action :amount -)))
@@ -63,15 +63,14 @@
 
 (defn transform-edit [edit missed-edits]
   (if (instance? AddText (:action edit))
-    (let [adjustment (reduce
-                       +
-                       0
-                       (traverse [ALL
-                                  (selected? :offset (pred<= (:offset edit)))
-                                  :action
-                                  (view add-action-adjustment)]
-                         missed-edits))]
-    [(update edit :offset #(+ % adjustment))])
+    (let [new-offset (reduce
+                       (fn [offset missed-edit]
+                         (if (<= (:offset missed-edit) offset)
+                           (+ offset (add-action-adjustment missed-edit))
+                           offset))
+                       (:offset edit)
+                       missed-edits)]
+    [(assoc edit :offset new-offset)])
   (reduce
     (fn [removes {:keys [offset action]}]
       (if (instance? AddText action)
