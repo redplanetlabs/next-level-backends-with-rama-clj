@@ -102,7 +102,7 @@
       $$docs
       {Long String})
     (<<sources topology
-      (source> *edit-depot :> {:keys [*id *version *offset *action] :as *edit})
+      (source> *edit-depot :> {:keys [*id *version] :as *edit})
       (local-select> [(keypath *id) (view count)]
         $$edits :> *latest-version)
       (<<if (= *latest-version *version)
@@ -120,4 +120,11 @@
       (local-transform>
         [(keypath *id) END (termval *final-edits)]
         $$edits)
-      )))
+      ))
+  (<<query-topology topologies "doc+version"
+    [*id :> *ret]
+    (|hash *id)
+    (local-select> (keypath *id) $$docs :> *doc)
+    (local-select> [(keypath *id) (view count)] $$edits :> *version)
+    (hash-map :doc *doc :version *version :> *ret)
+    (|origin)))

@@ -91,38 +91,38 @@
     (rtest/launch-module! ipc cde/CollaborativeDocumentEditorModule {:tasks 4 :threads 2})
     (let [module-name (get-module-name cde/CollaborativeDocumentEditorModule)
           edit-depot (foreign-depot ipc module-name "*edit-depot")
-          docs (foreign-pstate ipc module-name "$$docs")]
+          doc+version (foreign-query ipc module-name "doc+version")]
       (foreign-append!
         edit-depot
         (cde/->Edit 123 0 0 (cde/->AddText "Hellox")))
-      (is (= "Hellox" (foreign-select-one (keypath 123) docs)))
+      (is (= {:doc "Hellox" :version 1} (foreign-invoke-query doc+version 123)))
 
       (foreign-append!
         edit-depot
         (cde/->Edit 123 1 5 (cde/->RemoveText 1)))
-      (is (= "Hello" (foreign-select-one (keypath 123) docs)))
+      (is (= {:doc "Hello" :version 2} (foreign-invoke-query doc+version 123)))
 
       (foreign-append!
         edit-depot
         (cde/->Edit 123 2 5 (cde/->AddText " wor")))
-      (is (= "Hello world!" (foreign-select-one (keypath 123) docs)))
+      (is (= {:doc "Hello wor" :version 3} (foreign-invoke-query doc+version 123)))
 
       (foreign-append!
         edit-depot
         (cde/->Edit 123 3 9 (cde/->AddText "ld!")))
-      (is (= "Hello world!" (foreign-select-one (keypath 123) docs)))
+      (is (= {:doc "Hello world!" :version 4} (foreign-invoke-query doc+version 123)))
 
       (foreign-append!
         edit-depot
-        (cde/->Edit 123 2 5 (cde/->AddText " Rama")))
+        (cde/->Edit 123 2 5 (cde/->AddText "abcd")))
 
       (foreign-append!
         edit-depot
-        (cde/->Edit 123 2 0 (cde/->RemoveText 0 4)))
+        (cde/->Edit 123 2 0 (cde/->RemoveText 4)))
 
       (foreign-append!
         edit-depot
-        (cde/->Edit 123 0 0 (cde/->RemoveText 0 3)))
+        (cde/->Edit 123 1 0 (cde/->RemoveText 3)))
 
-      (is (= "o Rama world!" (foreign-select-one (keypath 123) docs)))
+      (is (= {:doc "o worabcdld!" :version 6} (foreign-invoke-query doc+version 123)))
       )))
