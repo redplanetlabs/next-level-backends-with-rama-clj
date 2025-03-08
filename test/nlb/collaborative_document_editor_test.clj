@@ -51,7 +51,7 @@
              (cde/transform-edit edit [(test-add-edit 16 "...")])))
       (is (= [(test-remove-edit 10 6)]
              (cde/transform-edit edit [(test-add-edit 20 "...")])))
-      (is (= [(test-remove-edit 10 2) (test-remove-edit 15 4)]
+      (is (= [(test-remove-edit 15 4) (test-remove-edit 10 2)]
              (cde/transform-edit edit [(test-add-edit 12 "...")]))))
     (testing "Remove against missed remove"
       (is (= [(test-remove-edit 8 6)]
@@ -78,7 +78,7 @@
              (cde/transform-edit edit [(test-remove-edit 18 10)])))
       ))
     (testing "Transform against multiple edits"
-      (is (= [(test-remove-edit 19 1) (test-remove-edit 22 3)]
+      (is (= [(test-remove-edit 22 3) (test-remove-edit 19 1)]
              (cde/transform-edit
                (test-remove-edit 20 5)
                [(test-add-edit 10 "...")

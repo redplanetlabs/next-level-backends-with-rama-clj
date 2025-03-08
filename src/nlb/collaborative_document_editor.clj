@@ -28,8 +28,8 @@
                 (let [remove1 (- offset start)
                       remove2 (- remove-amount remove1)
                       start2 (+ offset add-amt)]
-                  [(->Edit (:id edit) (:version edit) start (->RemoveText remove1))
-                   (->Edit (:id edit) (:version edit) start2 (->RemoveText remove2))
+                  [(->Edit (:id edit) (:version edit) start2 (->RemoveText remove2))
+                   (->Edit (:id edit) (:version edit) start (->RemoveText remove1))
                    ]))
           )))
      removes))
