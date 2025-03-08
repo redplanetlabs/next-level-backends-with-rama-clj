@@ -94,12 +94,12 @@
   (let [topology (stream-topology topologies "core")]
     (declare-pstate
       topology
-      $$edits
-      {Long (vector-schema Edit {:subindex? true})})
-    (declare-pstate
-      topology
       $$docs
       {Long String})
+    (declare-pstate
+      topology
+      $$edits
+      {Long (vector-schema Edit {:subindex? true})})
     (<<sources topology
       (source> *edit-depot :> {:keys [*id *version] :as *edit})
       (local-select> [(keypath *id) (view count)]
