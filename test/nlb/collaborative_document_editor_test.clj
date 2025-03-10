@@ -6,85 +6,85 @@
    [com.rpl.rama.test :as rtest]
    [nlb.collaborative-document-editor :as cde]))
 
-(defn- test-add-edit
+(defn mk-add-edit
   ([offset content]
-    (test-add-edit 123 0 offset content))
+    (mk-add-edit 123 0 offset content))
   ([id version offset content]
     (cde/->Edit id version offset (cde/->AddText content))))
 
-(defn- test-remove-edit
+(defn mk-remove-edit
   ([offset amount]
-    (test-remove-edit 123 0 offset amount))
+    (mk-remove-edit 123 0 offset amount))
   ([id version offset amount]
     (cde/->Edit id version offset (cde/->RemoveText amount))))
 
 (deftest transform-edit-test
-  (let [edit (test-add-edit 10 "abcde")]
+  (let [edit (mk-add-edit 10 "abcde")]
     (testing "Add against missed add"
-      (is (= [(test-add-edit 14 "abcde")]
-             (cde/transform-edit edit [(test-add-edit 8 "....")])))
-      (is (= [(test-add-edit 12 "abcde")]
-             (cde/transform-edit edit [(test-add-edit 10 "..")])))
-      (is (= [(test-add-edit 10 "abcde")]
-             (cde/transform-edit edit [(test-add-edit 17 "...")])))
-      (is (= [(test-add-edit 10 "abcde")]
-             (cde/transform-edit edit [(test-add-edit 20 ".")])))
-      (is (= [(test-add-edit 10 "abcde")]
-             (cde/transform-edit edit [(test-add-edit 12 ".")]))))
+      (is (= [(mk-add-edit 14 "abcde")]
+             (cde/transform-edit edit [(mk-add-edit 8 "....")])))
+      (is (= [(mk-add-edit 12 "abcde")]
+             (cde/transform-edit edit [(mk-add-edit 10 "..")])))
+      (is (= [(mk-add-edit 10 "abcde")]
+             (cde/transform-edit edit [(mk-add-edit 17 "...")])))
+      (is (= [(mk-add-edit 10 "abcde")]
+             (cde/transform-edit edit [(mk-add-edit 20 ".")])))
+      (is (= [(mk-add-edit 10 "abcde")]
+             (cde/transform-edit edit [(mk-add-edit 12 ".")]))))
     (testing "Add against missed remove"
-      (is (= [(test-add-edit 7 "abcde")]
-             (cde/transform-edit edit [(test-remove-edit 8 3)])))
-      (is (= [(test-add-edit 6 "abcde")]
-             (cde/transform-edit edit [(test-remove-edit 10 4)])))
-      (is (= [(test-add-edit 10 "abcde")]
-             (cde/transform-edit edit [(test-remove-edit 15 2)])))
-      (is (= [(test-add-edit 10 "abcde")]
-             (cde/transform-edit edit [(test-remove-edit 20 2)])))
+      (is (= [(mk-add-edit 7 "abcde")]
+             (cde/transform-edit edit [(mk-remove-edit 8 3)])))
+      (is (= [(mk-add-edit 6 "abcde")]
+             (cde/transform-edit edit [(mk-remove-edit 10 4)])))
+      (is (= [(mk-add-edit 10 "abcde")]
+             (cde/transform-edit edit [(mk-remove-edit 15 2)])))
+      (is (= [(mk-add-edit 10 "abcde")]
+             (cde/transform-edit edit [(mk-remove-edit 20 2)])))
       ))
-  (let [edit (test-remove-edit 10 6)]
+  (let [edit (mk-remove-edit 10 6)]
     (testing "Remove against missed add"
-      (is (= [(test-remove-edit 13 6)]
-             (cde/transform-edit edit [(test-add-edit 8 "...")])))
-      (is (= [(test-remove-edit 14 6)]
-             (cde/transform-edit edit [(test-add-edit 10 "....")])))
-      (is (= [(test-remove-edit 10 6)]
-             (cde/transform-edit edit [(test-add-edit 16 "...")])))
-      (is (= [(test-remove-edit 10 6)]
-             (cde/transform-edit edit [(test-add-edit 20 "...")])))
-      (is (= [(test-remove-edit 15 4) (test-remove-edit 10 2)]
-             (cde/transform-edit edit [(test-add-edit 12 "...")]))))
+      (is (= [(mk-remove-edit 13 6)]
+             (cde/transform-edit edit [(mk-add-edit 8 "...")])))
+      (is (= [(mk-remove-edit 14 6)]
+             (cde/transform-edit edit [(mk-add-edit 10 "....")])))
+      (is (= [(mk-remove-edit 10 6)]
+             (cde/transform-edit edit [(mk-add-edit 16 "...")])))
+      (is (= [(mk-remove-edit 10 6)]
+             (cde/transform-edit edit [(mk-add-edit 20 "...")])))
+      (is (= [(mk-remove-edit 15 4) (mk-remove-edit 10 2)]
+             (cde/transform-edit edit [(mk-add-edit 12 "...")]))))
     (testing "Remove against missed remove"
-      (is (= [(test-remove-edit 8 6)]
-             (cde/transform-edit edit [(test-remove-edit 0 2)])))
-      (is (= [(test-remove-edit 8 3)]
-             (cde/transform-edit edit [(test-remove-edit 8 5)])))
+      (is (= [(mk-remove-edit 8 6)]
+             (cde/transform-edit edit [(mk-remove-edit 0 2)])))
+      (is (= [(mk-remove-edit 8 3)]
+             (cde/transform-edit edit [(mk-remove-edit 8 5)])))
       (is (= []
-             (cde/transform-edit edit [(test-remove-edit 7 100)])))
-      (is (= [(test-remove-edit 10 5)]
-             (cde/transform-edit edit [(test-remove-edit 10 1)])))
+             (cde/transform-edit edit [(mk-remove-edit 7 100)])))
+      (is (= [(mk-remove-edit 10 5)]
+             (cde/transform-edit edit [(mk-remove-edit 10 1)])))
       (is (= []
-             (cde/transform-edit edit [(test-remove-edit 10 6)])))
+             (cde/transform-edit edit [(mk-remove-edit 10 6)])))
       (is (= []
-             (cde/transform-edit edit [(test-remove-edit 10 10)])))
-      (is (= [(test-remove-edit 10 4)]
-             (cde/transform-edit edit [(test-remove-edit 12 2)])))
-      (is (= [(test-remove-edit 10 2)]
-             (cde/transform-edit edit [(test-remove-edit 12 10)])))
-      (is (= [(test-remove-edit 10 6)]
-             (cde/transform-edit edit [(test-remove-edit 16 1)])))
-      (is (= [(test-remove-edit 10 6)]
-             (cde/transform-edit edit [(test-remove-edit 16 10)])))
-      (is (= [(test-remove-edit 10 6)]
-             (cde/transform-edit edit [(test-remove-edit 18 10)])))
+             (cde/transform-edit edit [(mk-remove-edit 10 10)])))
+      (is (= [(mk-remove-edit 10 4)]
+             (cde/transform-edit edit [(mk-remove-edit 12 2)])))
+      (is (= [(mk-remove-edit 10 2)]
+             (cde/transform-edit edit [(mk-remove-edit 12 10)])))
+      (is (= [(mk-remove-edit 10 6)]
+             (cde/transform-edit edit [(mk-remove-edit 16 1)])))
+      (is (= [(mk-remove-edit 10 6)]
+             (cde/transform-edit edit [(mk-remove-edit 16 10)])))
+      (is (= [(mk-remove-edit 10 6)]
+             (cde/transform-edit edit [(mk-remove-edit 18 10)])))
       ))
     (testing "Transform against multiple edits"
-      (is (= [(test-remove-edit 22 3) (test-remove-edit 19 1)]
+      (is (= [(mk-remove-edit 22 3) (mk-remove-edit 19 1)]
              (cde/transform-edit
-               (test-remove-edit 20 5)
-               [(test-add-edit 10 "...")
-                (test-remove-edit 100 10)
-                (test-remove-edit 19 5)
-                (test-add-edit 20 "..")])))))
+               (mk-remove-edit 20 5)
+               [(mk-add-edit 10 "...")
+                (mk-remove-edit 100 10)
+                (mk-remove-edit 19 5)
+                (mk-add-edit 20 "..")])))))
 
 (deftest module-test
   (with-open [ipc (rtest/create-ipc)]
