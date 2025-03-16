@@ -3,12 +3,16 @@
         [com.rpl.rama.path])
   (:import [com.rpl.rama.helpers TopologyScheduler]))
 
+(defn test-mode? [] false)
+
 (defrecord ScheduledPost [id time-millis post])
 
 (defmodule TimedNotificationsModule
   [setup topologies]
   (declare-depot setup *scheduled-post-depot (hash-by :id))
-  (declare-tick-depot setup *tick 1000)
+  (if (test-mode?)
+    (declare-depot setup *tick :random {:global? true})
+    (declare-tick-depot setup *tick 1000))
   (let [topology (stream-topology topologies "core")
         scheduler (TopologyScheduler. "$$scheduled")]
     (declare-pstate
