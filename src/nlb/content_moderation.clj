@@ -28,8 +28,8 @@
      (local-transform> [(keypath *to-user-id) AFTER-ELEM (termval *post)]
        $$posts)
 
-     (source> *mute-depot :> *item)
-     (<<subsource *item
+     (source> *mute-depot :> *data)
+     (<<subsource *data
        (case> Mute :> {:keys [*user-id *muted-user-id]})
        (local-transform> [(keypath *user-id) NONE-ELEM (termval *muted-user-id)]
         $$mutes)
@@ -58,12 +58,12 @@
     (hash-map :fetched-posts *posts :next-offset *next-offset :> *ret))
   (<<query-topology topologies "get-posts" [*user-id *from-offset *limit :> *ret]
     (|hash *user-id)
-    (loop<- [*next-offset *from-offset
+    (loop<- [*query-offset *from-offset
              *posts []
              :> *posts *next-offset]
       (invoke-query "get-posts-helper"
         *user-id
-        *next-offset
+        *query-offset
         (- *limit (count *posts))
         :> {:keys [*fetched-posts *next-offset]})
       (reduce conj *posts *fetched-posts :> *new-posts)
