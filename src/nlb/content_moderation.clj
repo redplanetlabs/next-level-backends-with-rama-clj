@@ -5,7 +5,6 @@
             [com.rpl.rama.ops :as ops])
   (:import [java.util UUID]))
 
-
 (defrecord Post [from-user-id to-user-id content])
 (defrecord Mute [user-id muted-user-id])
 (defrecord Unmute [user-id unmuted-user-id])
