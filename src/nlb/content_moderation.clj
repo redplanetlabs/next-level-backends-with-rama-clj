@@ -46,7 +46,7 @@
     (<<if (= *end-offset *num-posts)
       (identity nil :> *next-offset)
      (else>)
-      (identity *end-offset *next-offset))
+      (identity *end-offset :> *next-offset))
     (local-select> [(keypath *user-id) (srange *from-offset *end-offset) ALL]
       $$posts :> {:keys [*from-user-id] :as *post})
     (local-select> [(keypath *user-id) (view contains? *from-user-id)]
