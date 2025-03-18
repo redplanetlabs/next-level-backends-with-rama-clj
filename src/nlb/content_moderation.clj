@@ -7,13 +7,13 @@
 
 
 (defrecord Post [from-user-id to-user-id content])
-(defrecord Ban [user-id banned-user-id])
-(defrecord Unban [user-id unbanned-user-id])
+(defrecord Mute [user-id muted-user-id])
+(defrecord Unmute [user-id unmuted-user-id])
 
 (defmodule ContentModerationModule
   [setup topologies]
   (declare-depot setup *post-depot (hash-by :to-user-id))
-  (declare-depot setup *ban-depot (hash-by :user-id))
+  (declare-depot setup *mute-depot (hash-by :user-id))
   (let [topology (stream-topology topologies "core")]
     (declare-pstate
       topology
@@ -21,22 +21,22 @@
       {Long (vector-schema Post {:subindex? true})})
     (declare-pstate
       topology
-      $$bans
+      $$mutes
       {Long (set-schema Long {:subindex? true})})
    (<<sources topology
      (source> *post-depot :> {:keys [*to-user-id] :as *post})
      (local-transform> [(keypath *to-user-id) AFTER-ELEM (termval *post)]
        $$posts)
 
-     (source> *ban-depot :> *item)
+     (source> *mute-depot :> *item)
      (<<subsource *item
-       (case> Ban :> {:keys [*user-id *banned-user-id]})
-       (local-transform> [(keypath *user-id) NONE-ELEM (termval *banned-user-id)]
-        $$bans)
+       (case> Mute :> {:keys [*user-id *muted-user-id]})
+       (local-transform> [(keypath *user-id) NONE-ELEM (termval *muted-user-id)]
+        $$mutes)
 
-       (case> Unban :> {:keys [*user-id *unbanned-user-id]})
-       (local-transform> [(keypath *user-id) (set-elem *unbanned-user-id) NONE>]
-        $$bans)
+       (case> Unmute :> {:keys [*user-id *unmuted-user-id]})
+       (local-transform> [(keypath *user-id) (set-elem *unmuted-user-id) NONE>]
+        $$mutes)
        )))
   (<<query-topology topologies "get-posts-helper"
     [*user-id *from-offset *limit :> *ret]
@@ -50,8 +50,8 @@
     (local-select> [(keypath *user-id) (srange *from-offset *end-offset) ALL]
       $$posts :> {:keys [*from-user-id] :as *post})
     (local-select> [(keypath *user-id) (view contains? *from-user-id)]
-      $$bans :> *banned?)
-    (filter> (not *banned?))
+      $$mutes :> *muted?)
+    (filter> (not *muted?))
     (|origin)
     (aggs/+vec-agg *post :> *posts)
     (aggs/+last *next-offset :> *next-offset)

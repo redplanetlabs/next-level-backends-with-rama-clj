@@ -11,7 +11,7 @@
     (rtest/launch-module! ipc cm/ContentModerationModule {:tasks 4 :threads 2})
     (let [module-name (get-module-name cm/ContentModerationModule)
           post-depot (foreign-depot ipc module-name "*post-depot")
-          ban-depot (foreign-depot ipc module-name "*ban-depot")
+          mute-depot (foreign-depot ipc module-name "*mute-depot")
           get-posts (foreign-query ipc module-name "get-posts")]
       ;; TODO
       )))
