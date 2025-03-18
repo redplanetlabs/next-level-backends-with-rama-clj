@@ -55,7 +55,7 @@
     (|origin)
     (aggs/+vec-agg *post :> *posts)
     (aggs/+last *next-offset :> *next-offset)
-    (hash-map :fetched-posts *posts :next-offset *next-offset:> *ret))
+    (hash-map :fetched-posts *posts :next-offset *next-offset :> *ret))
   (<<query-topology topologies "get-posts" [*user-id *from-offset *limit :> *ret]
     (|hash *user-id)
     (loop<- [*next-offset *from-offset
@@ -74,5 +74,5 @@
         (continue> *next-offset *new-posts)
         ))
     (|origin)
-    (hash-map :posts *posts :next-offset *next-offset :> *ret)
-    ))
+    (hash-map :posts *posts :next-offset *next-offset :> *ret))
+  )
