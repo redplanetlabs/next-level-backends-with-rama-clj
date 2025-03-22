@@ -38,7 +38,7 @@
          $$mutes)
        )))
   (<<query-topology topologies "get-posts-helper"
-    [*user-id *start-offset *end-offset :> *ret]
+    [*user-id *start-offset *end-offset :> *posts]
     (|hash *user-id)
     (local-select> [(keypath *user-id) (srange *start-offset *end-offset) ALL]
       $$posts :> {:keys [*from-user-id] :as *post})
@@ -46,7 +46,7 @@
       $$mutes :> *muted?)
     (filter> (not *muted?))
     (|origin)
-    (aggs/+vec-agg *post :> *ret))
+    (aggs/+vec-agg *post :> *posts))
   (<<query-topology topologies "get-posts" [*user-id *from-offset *limit :> *ret]
     (|hash *user-id)
     (loop<- [*query-offset *from-offset
@@ -61,14 +61,14 @@
         *end-offset
         :> *fetched-posts)
       (reduce conj *posts *fetched-posts :> *new-posts)
-      (<<if (or> (= *end-offset *num-posts)
-                 (= (count *new-posts) *limit))
-        (<<if (= *end-offset *num-posts)
-          (identity nil :> *next-offset)
-         (else>)
-          (identity *end-offset :> *next-offset))
-        (:> *new-posts *next-offset)
-       (else>)
+      (<<cond
+        (case> (= *end-offset *num-posts))
+        (:> *new-posts nil)
+
+        (case> (= (count *new-posts) *limit))
+        (:> *new-posts *end-offset)
+
+        (default>)
         (continue> *end-offset *new-posts)
         ))
     (|origin)
