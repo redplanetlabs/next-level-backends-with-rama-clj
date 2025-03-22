@@ -31,46 +31,45 @@
      (<<subsource *data
        (case> Mute :> {:keys [*user-id *muted-user-id]})
        (local-transform> [(keypath *user-id) NONE-ELEM (termval *muted-user-id)]
-        $$mutes)
+         $$mutes)
 
        (case> Unmute :> {:keys [*user-id *unmuted-user-id]})
        (local-transform> [(keypath *user-id) (set-elem *unmuted-user-id) NONE>]
-        $$mutes)
+         $$mutes)
        )))
   (<<query-topology topologies "get-posts-helper"
-    [*user-id *from-offset *limit :> *ret]
+    [*user-id *start-offset *end-offset :> *ret]
     (|hash *user-id)
-    (local-select> [(keypath *user-id) (view count)] $$posts :> *num-posts)
-    (min *num-posts (+ *from-offset *limit) :> *end-offset)
-    (<<if (= *end-offset *num-posts)
-      (identity nil :> *next-offset)
-     (else>)
-      (identity *end-offset :> *next-offset))
-    (local-select> [(keypath *user-id) (srange *from-offset *end-offset) ALL]
+    (local-select> [(keypath *user-id) (srange *start-offset *end-offset) ALL]
       $$posts :> {:keys [*from-user-id] :as *post})
     (local-select> [(keypath *user-id) (view contains? *from-user-id)]
       $$mutes :> *muted?)
     (filter> (not *muted?))
     (|origin)
-    (aggs/+vec-agg *post :> *posts)
-    (aggs/+last *next-offset :> *next-offset)
-    (hash-map :fetched-posts *posts :next-offset *next-offset :> *ret))
+    (aggs/+vec-agg *post :> *ret))
   (<<query-topology topologies "get-posts" [*user-id *from-offset *limit :> *ret]
     (|hash *user-id)
     (loop<- [*query-offset *from-offset
              *posts []
              :> *posts *next-offset]
+      (local-select> [(keypath *user-id) (view count)] $$posts :> *num-posts)
+      (- *limit (count *posts) :> *fetch-amount)
+      (min *num-posts (+ *query-offset *fetch-amount) :> *end-offset)
       (invoke-query "get-posts-helper"
         *user-id
         *query-offset
-        (- *limit (count *posts))
-        :> {:keys [*fetched-posts *next-offset]})
+        *end-offset
+        :> *fetched-posts)
       (reduce conj *posts *fetched-posts :> *new-posts)
-      (<<if (or> (nil? *next-offset)
+      (<<if (or> (= *end-offset *num-posts)
                  (= (count *new-posts) *limit))
+        (<<if (= *end-offset *num-posts)
+          (identity nil :> *next-offset)
+         (else>)
+          (identity *end-offset :> *next-offset))
         (:> *new-posts *next-offset)
        (else>)
-        (continue> *next-offset *new-posts)
+        (continue> *end-offset *new-posts)
         ))
     (|origin)
     (hash-map :posts *posts :next-offset *next-offset :> *ret))
