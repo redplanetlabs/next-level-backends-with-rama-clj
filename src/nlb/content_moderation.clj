@@ -55,10 +55,7 @@
       (local-select> [(keypath *user-id) (view count)] $$posts :> *num-posts)
       (- *limit (count *posts) :> *fetch-amount)
       (min *num-posts (+ *query-offset *fetch-amount) :> *end-offset)
-      (invoke-query "get-posts-helper"
-        *user-id
-        *query-offset
-        *end-offset
+      (invoke-query "get-posts-helper" *user-id *query-offset *end-offset
         :> *fetched-posts)
       (reduce conj *posts *fetched-posts :> *new-posts)
       (<<cond
