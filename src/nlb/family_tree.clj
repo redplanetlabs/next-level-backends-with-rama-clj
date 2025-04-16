@@ -20,17 +20,17 @@
                :parent2 UUID
                :name String
                :children #{UUID}})})
-   (<<sources topology
-     (source> *people-depot :> {:keys [*id *parent1 *parent2] :as *person})
-     (local-transform>
-       [(keypath *id) (termval (dissoc *person :id))]
-       $$family-tree)
-     (ops/explode [*parent1 *parent2] :> *parent)
-     (|hash *parent)
-     (local-transform>
-       [(keypath *parent) :children NONE-ELEM (termval *id)]
-       $$family-tree)
-     ))
+    (<<sources topology
+      (source> *people-depot :> {:keys [*id *parent1 *parent2] :as *person})
+      (local-transform>
+        [(keypath *id) (termval (dissoc *person :id))]
+        $$family-tree)
+      (ops/explode [*parent1 *parent2] :> *parent)
+      (|hash *parent)
+      (local-transform>
+        [(keypath *parent) :children NONE-ELEM (termval *id)]
+        $$family-tree)
+      ))
   (<<query-topology topologies "ancestors"
     [*start-id *num-generations :> *ancestors]
     (loop<- [*id *start-id
