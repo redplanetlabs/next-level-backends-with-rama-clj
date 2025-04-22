@@ -51,7 +51,7 @@
 
       (is (= #{p7 p8} (foreign-invoke-query ancestors-query p10 0)))
       (is (= #{p7 p8 p1 p2 p3 p4} (foreign-invoke-query ancestors-query p10 1)))
-      (is (= #{p10 p11 p7 p8 p9 p1 p2 p3 p4 p5} (foreign-invoke-query ancestors-query p14 2)))
+      (is (= #{p10 p11 p7 p8 p9 p1 p2 p3 p4 p5} (foreign-invoke-query ancestors-query p14 3)))
 
       (is (= {0 0} (foreign-invoke-query descendants-count-query p14 10)))
       (is (= {0 3 1 0} (foreign-invoke-query descendants-count-query p11 10)))
